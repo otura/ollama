@@ -8,13 +8,14 @@ services:
       - ./models:/root/.ollama/models
     networks:
       - genai-network
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: no
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     ports:
@@ -25,6 +26,33 @@ services:
       - ./backend/data:/app/backend/data
     networks:
       - genai-network
+    restart: no
+  nginx:
+    image: nginx:latest
+    container_name: webserver
+    ports:
+      - "9080:80"
+      - "9443:443"
+    volumes:
+      - ./nginx:/etc/nginx/
+      - ./nginx/ssl:/ssl/
+    networks:
+      - genai-network
+    restart: no
+
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    ports:
+      - "10080:80"
+      - "10081:81"
+      - "10443:443"
+    volumes:
+      - ./nginx-proxy-manager/data:/data
+      - ./nginx-proxy-manager/letsencrypt:/etc/letsencrypt
+    networks:
+      - genai-network
+    restart: no
+
 networks:
   genai-network:
     driver: bridge

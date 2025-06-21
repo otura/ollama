@@ -1,3 +1,10 @@
+# Do not upload to gitlab persistent data
+backend/
+models/
+nginx/
+nginx-proxy-manager/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
